@@ -6,8 +6,7 @@ os.environ["CXX"] = "/usr/local/opt/llvm/bin/clang++"
 from setuptools import setup, Extension, find_packages
 from glob import glob
 import shutil
-# Available at setup time due to pyproject.toml
-from pybind11.setup_helpers import Pybind11Extension, build_ext
+
 import pybind11
 import sys
 
