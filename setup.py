@@ -1,7 +1,12 @@
 import os
+import sys
 from os.path import exists, join
-os.environ["CC"] = "/usr/local/opt/llvm/bin/clang++"
-os.environ["CXX"] = "/usr/local/opt/llvm/bin/clang++"
+if sys.platform == 'darwin':
+    os.environ["CC"] = "/usr/local/opt/llvm/bin/clang++"
+    os.environ["CXX"] = "/usr/local/opt/llvm/bin/clang++"
+elif sys.platform == 'linux':
+    os.environ["CC"] = "g++"
+    os.environ["CXX"] = "g++"
 
 from setuptools import setup, Extension, find_packages
 from glob import glob
