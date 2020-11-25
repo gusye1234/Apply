@@ -30,12 +30,8 @@ ext_modules = [
         library_dirs=[
             '/usr/local/opt/llvm/lib',
         ],
-        libraries = [
-            'omp'
-        ],
-        extra_compile_args=[
-            '-fopenmp',
-        ]
+        libraries=['omp'],
+        extra_compile_args=['-fopenmp', '-fPIC', '-shared']
         # Example: passing in the version to the compiled code
         # define_macros=[('VERSION_INFO', __version__)],
     )
