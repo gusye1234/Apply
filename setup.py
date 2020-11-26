@@ -21,11 +21,16 @@ module_dir = "./apply"
 
 ext_modules = [
     Extension(
-        "apply.operator_omp",
+        "apply.omp",
         language='c++',
-        sources=["apply/src/operator_omp.cpp"],
+        sources=[
+            "apply/src/omp.cpp", 
+            # 'apply/src/operator.h',
+            "apply/src/types.cpp"
+        ],
         include_dirs=[
             pybind11.get_include(),
+            './apply/src'
         ],
         library_dirs=[
             '/usr/local/opt/llvm/lib',

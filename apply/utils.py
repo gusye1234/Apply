@@ -1,4 +1,5 @@
-
+import os
+import subprocess
 class timer:
     """
     Time context manager for code block
@@ -63,3 +64,26 @@ class timer:
             timer.NAMED_TAPE[self.named] += timer.time() - self.start
         else:
             self.tape.append(timer.time() - self.start)
+
+
+def detect_number_of_cores():
+    """
+    Detects the number of cores on a system. Cribbed from pp.
+    """
+    # Linux, Unix and MacOS:
+    if hasattr(os, "sysconf"):
+        if "SC_NPROCESSORS_ONLN" in os.sysconf_names:
+            # Linux & Unix:
+            ncpus = os.sysconf("SC_NPROCESSORS_ONLN")
+            if isinstance(ncpus, int) and ncpus > 0:
+                return ncpus
+        else:  # OSX:
+            return int(subprocess.check_output(["sysctl", "-n", "hw.ncpu"]))
+    # Windows:
+    try:
+        ncpus = int(os.environ.get("NUMBER_OF_PROCESSORS", ""))
+        if ncpus > 0:
+            return ncpus
+    except ValueError:
+        pass
+    return 1  # Default
