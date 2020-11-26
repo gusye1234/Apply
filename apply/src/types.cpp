@@ -23,29 +23,28 @@ py::buffer_info matrix_buff(Matrix &m)
 }
 
 
-#define ADD(type) \
-py::array_t<type> add_one_##type(py::array_t<type> &in_array) \
-{\
-    py::buffer_info buf = in_array.request(); \
-    py::array_t<type> temp = py::array_t<type>(buf.shape); \
-    py::buffer_info buf_temp = temp.request(); \
-    size_t arr_size = buf.size; \
-    type *ptr = (type *)buf_temp.ptr; \
-    type *ptr_o = (type *)buf.ptr; \
-    int max_threads = 8; \
+#define ADD(type)     ADDNAME(type)                              \
+{                                                                \
+    py::buffer_info buf = in_array.request();                    \
+    py::array_t<type> temp = py::array_t<type>(buf.shape);       \
+    py::buffer_info buf_temp = temp.request();                   \
+    size_t arr_size = buf.size;                                  \
+    type *ptr = (type *)buf_temp.ptr;                            \
+    type *ptr_o = (type *)buf.ptr;                               \
+    int max_threads = 8;                                         \
     int arrange = (int)std::ceil((float)arr_size / max_threads); \
-    _Pragma("omp parallel for") \
-    for (int thread = 0; thread < max_threads; thread++) \
-    { \
-        for (int i = 0; i < arrange; i++)\
-        { \
+    _Pragma("omp parallel for")                                  \
+    for (int thread = 0; thread < max_threads; thread++)         \
+    {                                                            \
+        for (int i = 0; i < arrange; i++)                        \
+        {                                                        \
             printf("Now threads is %d\n", omp_get_thread_num()); \
-            int index = (thread * arrange + i); \
-            if (index >= arr_size) \
-            { \
-                break; \
-            } \
-            ptr[index] = ptr_o[index] + 1; \
+            int index = (thread * arrange + i);                  \
+            if (index >= arr_size)                               \
+            {                                                    \
+                break;                                           \
+            }                                                    \
+            ptr[index] = ptr_o[index] + 1;                       \
         } \
     } \
     return temp;}\
