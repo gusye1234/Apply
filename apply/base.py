@@ -1,4 +1,5 @@
 import numpy as np
+import os
 try:
     import pycuda
     import pycuda.autoinit
