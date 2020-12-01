@@ -6,6 +6,8 @@ try:
 except ModuleNotFoundError:
     CUDA_SUPPORT = False
 
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+
 SUPPORT_TYPE = ['int32', 'int64','float32', 'float64', 'float128']
 
 TYPE_PRIORITY = {SUPPORT_TYPE[i]: i for i in range(len(SUPPORT_TYPE))}
