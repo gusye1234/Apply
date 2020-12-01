@@ -26,47 +26,72 @@ def test_arr():
     import numpy as np
     omp.SIZE()
     omp.hello()
-    a = np.random.rand(20000000).astype('float')
-    b = np.random.rand(20000000).astype('float')
-    omp.add_scalar_float(a, 10)
+    a = np.random.rand(20000000).astype('int32')
+    # b = np.random.rand(20000000).astype('int32')
     with timer(name="omp"):
         for _ in range(10):
-            omp.add_vector_float(a, b)
+            # omp.add_scalar_float32(a, 1)
+            # omp.exp_vector_float32(a)
+            # omp.cos_vector_float32(a)
+            print(openmp.omp_add(a, 2.3).dtype)
     print(f"mean {timer.get('omp') / 10}")
     with timer(name="np"):
         for _ in range(10):
-            c = a + b
+            # c = a+1
+            # c = -a
+            # np.exp(a)
+            # np.cos(a)
+            c = a/2.3
+            print(c.dtype)
     print(f"mean {timer.get('np') / 10}")
-    print(omp.add_scalar_float(a, 10))
-    print(a)
+    print(omp.div_scalar_int32(a, 2.3))
+    print(a/2)
 
 def test_add():
     from . import omp
+    from .openmp import omp_add
+    from .trace import tracer
+    from .base import broadcast
     import numpy as np
     omp.hello()
-    def omp_add(a : np.ndarray,
-                b : np.ndarray,
-                types : str):
-        if np.isscalar(b):
-            print('scalar')
-            return getattr(omp, 'add_scalar_' + types)(a, b)
-        else:
-            if a.shape != b.shape:
-                a, b = broadcast(a._data, b)
-            return getattr(omp, 'add_vector_' + types)(a, b)
-
     a = np.random.rand(2000, 50000).astype('float32')
-    b = np.random.rand(2000, 50000).astype('float32')
-    print(a.dtype)
-    print(b.dtype)
-    with timer(name="omp"):
-        for _ in range(10):
-            omp_add(a, b, 'float32')
-    print(f"mean {timer.get('omp') / 10}")
-    with timer(name="np"):
-        for _ in range(10):
-            c = a + b
-    print(f"mean {timer.get('np') / 10}")
+    a_t = tracer(a)
+
+    with timer(name='omp cos'):
+        a_t.cos()
+    with timer(name='omp sin'):
+        a_t.sin()
+    with timer(name='omp exp'):
+        a_t.exp()
+    with timer(name='omp sub'):
+        a_t - 1
+    with timer(name='omp add'):
+        a_t + 1
+    with timer(name='omp mul'):
+        a_t * 1
+    with timer(name='omp div'):
+        a_t / 1
+    with timer(name='omp neg'):
+        -a_t
+    print(timer.dict())
+    timer.zero()
+    with timer(name='np cos'):
+        np.cos(a)
+    with timer(name='np sin'):
+        np.sin(a)
+    with timer(name='np exp'):
+        np.exp(a)
+    with timer(name='np sub'):
+        a - 1
+    with timer(name='np add'):
+        a + 1
+    with timer(name='np mul'):
+        a * 1
+    with timer(name='np div'):
+        a / 1
+    with timer(name='np neg'):
+        -a
+    print(timer.dict())
 
 if __name__ == "__main__":
     # test_ad()

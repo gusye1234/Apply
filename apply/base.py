@@ -1,11 +1,14 @@
 import numpy as np
-
+try:
+    import pycuda
+    import pycuda.autoinit
+    CUDA_SUPPORT = True
+except ModuleNotFoundError:
+    CUDA_SUPPORT = False
 
 SUPPORT_TYPE = ['int32', 'int64','float32', 'float64', 'float128']
 
-TYPE_PRIORITY = {
-    SUPPORT_TYPE[i]: i for i in range(SUPPORT_TYPE)
-}
+TYPE_PRIORITY = {SUPPORT_TYPE[i]: i for i in range(len(SUPPORT_TYPE))}
 
 
 class base_tracer:
@@ -15,13 +18,19 @@ class base_tracer:
                  need_to_move=False):
         if np.isscalar(data):
             self._data = data
+            self._scalar = True
+            if isinstance(data, int):
+                self.dtype = 'int32'
+            elif isinstance(data, float):
+                self.dtype = 'float32'
         else:
             try:
-                assert data.dtype in base_tracer.SUPPORT_TYPE
+                assert str(data.dtype) in SUPPORT_TYPE
             except:
                 raise NotImplementedError(f"Not support this number type {data.dtype} among {SUPPORT_TYPE}")
-        self.dtype = str(data.dtype)
-        self._data = data
+            self.dtype = str(data.dtype)
+            self._data = data
+            self._scalar = False
         self._device = device(device_name)
         if need_to_move:
             self.move_data_to_()
@@ -29,8 +38,8 @@ class base_tracer:
     def get_device(self):
         return self._device
 
-    def get_type(self):
-        return base_tracer.Table[str(self._data.dtype)]
+    def isscalar(self):
+        return self._scalar
 
     def to(self, name):
         return tracer(np.copy(self._data), name)
@@ -58,7 +67,12 @@ class base_tracer:
 
 class device:
     def __init__(self, name):
-        assert str(name) in ['omp', 'cuda']
+        assert str(name) in ['numpy', 'omp', 'cuda']
+        if str(name) == 'omp' and not support_omp():
+            raise TypeError(f"Not support openmp")
+        elif str(name) == 'cuda' and not CUDA_SUPPORT:
+            raise TypeError(f"Not support Cuda, please install CUDA and pyCUDA")
+
         self._name = str(name)
 
     def __repr__(self):
@@ -75,10 +89,19 @@ class device:
         else:
             return id(self) == id(b)
 
-
 def broadcast(a, b):
     a, b = np.broadcast_arrays(a, b)
     return np.ascontiguousarray(a), np.ascontiguousarray(b)
 
-def match_types(a, b):
-    pass
+def match_types(a : base_tracer, b : base_tracer):
+    if TYPE_PRIORITY[a.dtype] > TYPE_PRIORITY[b.dtype]:
+        return a.dtype
+    else:
+        return b.dtype
+
+def support_omp():
+    try:
+        from . import omp
+        return omp.openmp()
+    except ModuleNotFoundError:
+        return False

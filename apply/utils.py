@@ -36,11 +36,10 @@ class timer:
     @staticmethod
     def zero(select_keys=None):
         if select_keys is None:
-            for key, value in timer.NAMED_TAPE.items():
-                timer.NAMED_TAPE[key] = 0
+            timer.NAMED_TAPE = {}
         else:
             for key in select_keys:
-                timer.NAMED_TAPE[key] = 0
+                del timer.NAMED_TAPE[key]
 
     def __init__(self, tape=None, **kwargs):
         if kwargs.get('name'):

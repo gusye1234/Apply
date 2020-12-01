@@ -69,16 +69,84 @@ PYBIND11_MODULE(omp, m)
     m.def("set_num_threads", &set_num_threads, "Set num of threads of omp");
     m.def("hello", &hello, "say hello");
     m.def("SIZE", &show_size, "show sizes of different types");
-    m.def("add_scalar_int32", &add_scalar_int32, "test");
-    m.def("add_scalar_int64", &add_scalar_int64, "test");
-    m.def("add_scalar_float32", &add_scalar_float32, "test");
-    m.def("add_scalar_float64", &add_scalar_float64, "test");
+    
+    m.def("add_scalar_int32",    &add_scalar_int32, "test");
+    m.def("add_scalar_int64",    &add_scalar_int64, "test");
+    m.def("add_scalar_float32",  &add_scalar_float32, "test");
+    m.def("add_scalar_float64",  &add_scalar_float64, "test");
     m.def("add_scalar_float128", &add_scalar_float128, "test");
-    m.def("add_vector_int32", &add_vector_int32, "test");
-    m.def("add_vector_int64", &add_vector_int64, "test");
-    m.def("add_vector_float32", &add_vector_float32, "test");
-    m.def("add_vector_float64", &add_vector_float64, "test");
+    m.def("add_vector_int32",    &add_vector_int32, "test");
+    m.def("add_vector_int64",    &add_vector_int64, "test");
+    m.def("add_vector_float32",  &add_vector_float32, "test");
+    m.def("add_vector_float64",  &add_vector_float64, "test");
     m.def("add_vector_float128", &add_vector_float128, "test");
+
+    m.def("mul_scalar_int32",    &mul_scalar_int32, "test");
+    m.def("mul_scalar_int64",    &mul_scalar_int64, "test");
+    m.def("mul_scalar_float32",  &mul_scalar_float32, "test");
+    m.def("mul_scalar_float64",  &mul_scalar_float64, "test");
+    m.def("mul_scalar_float128", &mul_scalar_float128, "test");
+    m.def("mul_vector_int32",    &mul_vector_int32, "test");
+    m.def("mul_vector_int64",    &mul_vector_int64, "test");
+    m.def("mul_vector_float32",  &mul_vector_float32, "test");
+    m.def("mul_vector_float64",  &mul_vector_float64, "test");
+    m.def("mul_vector_float128", &add_vector_float128, "test");
+
+    m.def("sub_scalar_int32",     &sub_scalar_int32, "test");
+    m.def("sub_scalar_int64",     &sub_scalar_int64, "test");
+    m.def("sub_scalar_float32",   &sub_scalar_float32, "test");
+    m.def("sub_scalar_float64",   &sub_scalar_float64, "test");
+    m.def("sub_scalar_float128",  &sub_scalar_float128, "test");
+    m.def("sub_vector_int32",     &sub_vector_int32, "test");
+    m.def("sub_vector_int64",     &sub_vector_int64, "test");
+    m.def("sub_vector_float32",   &sub_vector_float32, "test");
+    m.def("sub_vector_float64",   &sub_vector_float64, "test");
+    m.def("sub_vector_float128",  &sub_vector_float128, "test");
+    m.def("rsub_vector_int32",    &rsub_scalar_int32, "test");
+    m.def("rsub_vector_int64",    &rsub_scalar_int64, "test");
+    m.def("rsub_vector_float32",  &rsub_scalar_float32, "test");
+    m.def("rsub_vector_float64",  &rsub_scalar_float64, "test");
+    m.def("rsub_vector_float128", &rsub_scalar_float128, "test");
+
+    m.def("div_scalar_int32",     &div_scalar_int32, "test");
+    m.def("div_scalar_int64",     &div_scalar_int64, "test");
+    m.def("div_scalar_float32",   &div_scalar_float32, "test");
+    m.def("div_scalar_float64",   &div_scalar_float64, "test");
+    m.def("div_scalar_float128",  &div_scalar_float128, "test");
+    m.def("div_vector_int32",     &div_vector_int32, "test");
+    m.def("div_vector_int64",     &div_vector_int64, "test");
+    m.def("div_vector_float32",   &div_vector_float32, "test");
+    m.def("div_vector_float64",   &div_vector_float64, "test");
+    m.def("div_vector_float128",  &rdiv_scalar_float128, "test");
+    m.def("rdiv_vector_int32",    &rdiv_scalar_int32, "test");
+    m.def("rdiv_vector_int64",    &rdiv_scalar_int64, "test");
+    m.def("rdiv_vector_float32",  &rdiv_scalar_float32, "test");
+    m.def("rdiv_vector_float64",  &rdiv_scalar_float64, "test");
+    m.def("rdiv_vector_float128", &rdiv_scalar_float128, "test");
+
+    m.def("neg_vector_int32",    &neg_vector_int32, "test");
+    m.def("neg_vector_int64",    &neg_vector_int64, "test");
+    m.def("neg_vector_float32",  &neg_vector_float32, "test");
+    m.def("neg_vector_float64",  &neg_vector_float64, "test");
+    m.def("neg_vector_float128", &neg_vector_float128, "test");
+
+    m.def("exp_vector_int32",    &exp_vector_int32, "test");
+    m.def("exp_vector_int64",    &exp_vector_int64, "test");
+    m.def("exp_vector_float32",  &exp_vector_float32, "test");
+    m.def("exp_vector_float64",  &exp_vector_float64, "test");
+    m.def("exp_vector_float128", &exp_vector_float128, "test");
+
+    m.def("sin_vector_int32",    &sin_vector_int32, "test");
+    m.def("sin_vector_int64",    &sin_vector_int64, "test");
+    m.def("sin_vector_float32",  &sin_vector_float32, "test");
+    m.def("sin_vector_float64",  &sin_vector_float64, "test");
+    m.def("sin_vector_float128", &sin_vector_float128, "test");
+
+    m.def("cos_vector_int32",    &cos_vector_int32, "test");
+    m.def("cos_vector_int64",    &cos_vector_int64, "test");
+    m.def("cos_vector_float32",  &cos_vector_float32, "test");
+    m.def("cos_vector_float64",  &cos_vector_float64, "test");
+    m.def("cos_vector_float128", &cos_vector_float128, "test");
 }
 
 // py::class_<Matrix>(m, "Matrix", py::buffer_protocol())
