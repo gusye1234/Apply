@@ -118,11 +118,11 @@ PYBIND11_MODULE(omp, m)
     m.def("div_vector_float32",   &div_vector_float32, "test");
     m.def("div_vector_float64",   &div_vector_float64, "test");
     m.def("div_vector_float128",  &rdiv_scalar_float128, "test");
-    m.def("rdiv_vector_int32",    &rdiv_scalar_int32, "test");
-    m.def("rdiv_vector_int64",    &rdiv_scalar_int64, "test");
-    m.def("rdiv_vector_float32",  &rdiv_scalar_float32, "test");
-    m.def("rdiv_vector_float64",  &rdiv_scalar_float64, "test");
-    m.def("rdiv_vector_float128", &rdiv_scalar_float128, "test");
+    m.def("rdiv_scalar_int32",    &rdiv_scalar_int32, "test");
+    m.def("rdiv_scalar_int64",    &rdiv_scalar_int64, "test");
+    m.def("rdiv_scalar_float32",  &rdiv_scalar_float32, "test");
+    m.def("rdiv_scalar_float64",  &rdiv_scalar_float64, "test");
+    m.def("rdiv_scalar_float128", &rdiv_scalar_float128, "test");
 
     m.def("neg_vector_int32",    &neg_vector_int32, "test");
     m.def("neg_vector_int64",    &neg_vector_int64, "test");
@@ -147,6 +147,7 @@ PYBIND11_MODULE(omp, m)
     m.def("cos_vector_float32",  &cos_vector_float32, "test");
     m.def("cos_vector_float64",  &cos_vector_float64, "test");
     m.def("cos_vector_float128", &cos_vector_float128, "test");
+    m.def("matmul", &matmul, "test");
 }
 
 // py::class_<Matrix>(m, "Matrix", py::buffer_protocol())

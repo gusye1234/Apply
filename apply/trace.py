@@ -1,6 +1,12 @@
 import numpy as np
+from . import base
 from .base import base_tracer, device, SUPPORT_TYPE, match_types
 from . import openmp
+
+if base.CUDA_SUPPORT:
+    from . import cuda
+else:
+    print("CUDA not support")
 
 def array(*args, **kwargs):
     arr = np.array(*args, **kwargs)
@@ -29,21 +35,38 @@ class tracer(base_tracer):
             data = _COPY(data, self)
         return data
 
+    def __getitem__(self, index):
+        data = self._data[index]
+        return _COPY(data, self)
+
+    def to(self, name):
+        return tracer(np.copy(self._data), name)
+
     def moveAndMatch(self, b):
         if not isinstance(b, tracer):
             b = _COPY(b, self)
+        else:
+            try:
+                assert self._device == b._device
+            except AssertionError:
+                raise AssertionError(f"Expect device to be the same, but got"\
+                                     f"{self._device} and {b._device}")
         types = match_types(self, b)
         return b, types
 
     def __neg__(self):
         if self._device == 'omp':
             data = openmp.omp_neg(self._data, self.dtype)
+        elif self._device == 'cuda':
+            data = cuda.cuda_neg(self._data, self.dtype)
         return _COPY(data, self)
 
     def __add__(self, b):
         b, types = self.moveAndMatch(b)
         if self._device == 'omp':
             data = openmp.omp_add(self._data, b._data, types)
+        elif self._device == 'cuda':
+            data = cuda.cuda_add(self._data, b._data, types)
         return _COPY(data, self)
 
     def __radd__(self, b):
@@ -53,18 +76,24 @@ class tracer(base_tracer):
         b, types = self.moveAndMatch(b)
         if self._device == 'omp':
             data = openmp.omp_sub(self._data, b._data, types)
+        elif self._device == 'cuda':
+            data = cuda.cuda_sub(self._data, b._data, types)
         return _COPY(data, self)
 
     def __rsub__(self, b):
         b, types = self.moveAndMatch(b)
         if self._device == 'omp':
             data = openmp.omp_sub(self._data, b._data, types, right=True)
+        elif self._device == 'cuda':
+            data = cuda.cuda_sub(self._data, b._data, types, right=True)
         return _COPY(data, self)
 
     def __mul__(self, b):
         b, types = self.moveAndMatch(b)
         if self._device == 'omp':
             data = openmp.omp_mul(self._data, b._data, types)
+        elif self._device == 'cuda':
+            data = cuda.cuda_mul(self._data, b._data, types)
         return _COPY(data, self)
 
     def __rmul__(self, b):
@@ -74,6 +103,8 @@ class tracer(base_tracer):
         b, types = self.moveAndMatch(b)
         if self._device == 'omp':
             data = openmp.omp_div(self._data, b._data, types)
+        elif self._device == 'cuda':
+            data = cuda.cuda_div(self._data, b._data, types)
         return _COPY(data, self)
         # return _COPY(self._data.__truediv__(b), self)
         # return _COPY(self._data.__floordiv__(b), self)
@@ -82,22 +113,30 @@ class tracer(base_tracer):
         b, types = self.moveAndMatch(b)
         if self._device == 'omp':
             data = openmp.omp_div(self._data, b._data, types, right=True)
+        elif self._device == 'cuda':
+            data = cuda.cuda_div(self._data, b._data, types, right=True)
         return _COPY(data, self)
         # return _COPY(self._data.__rtruediv__(b), self)
 
     def exp(self):
         if self._device == 'omp':
             data = openmp.omp_exp(self._data, self.dtype)
+        elif self._device == 'cuda':
+            data = cuda.cuda_exp(self._data, self.dtype)
         return _COPY(data, self)
 
     def sin(self):
         if self._device == 'omp':
             data = openmp.omp_sin(self._data, self.dtype)
+        elif self._device == 'cuda':
+            data = cuda.cuda_sin(self._data, self.dtype)
         return _COPY(data, self)
 
     def cos(self):
         if self._device == 'omp':
             data = openmp.omp_cos(self._data, self.dtype)
+        elif self._device == 'cuda':
+            data = cuda.cuda_cos(self._data, self.dtype)
         return _COPY(data, self)
 
 

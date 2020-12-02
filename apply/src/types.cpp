@@ -75,6 +75,32 @@ void Arrange(size_t arr_size, int &max_threads, int &arrange){
     SIN_VECTORNAME(type) \
     VECTOR_TYPE(type, float32, std::sin(ptr_in[index]))
 
+py::array_t<float32> matmul(py::array_t<float32, py::array::c_style> &mat1, py::array_t<float32, py::array::f_style> &mat2)
+{
+    py::buffer_info buf_1 = mat1.request(), buf_2 = mat2.request();
+    vector<ssize_t> size_1 = buf_1.shape, size_2 = buf_2.shape;
+    ssize_t row = size_1[0], col = size_2[1], inter = size_1[1];
+    py::array_t<float32> temp({row, col});
+    py::buffer_info buf = temp.request();
+    float32 * ptr = (float32 *)buf.ptr, *ptr_1 = (float32 *)buf_1.ptr, *ptr_2 = (float32 *)buf_2.ptr;
+    printf("SIZE %ld %ld %ld", row, inter, col);
+    ssize_t i=0, j=0, k=0;
+    #pragma omp parallel for shared(ptr, ptr_1, ptr_2, row, col, inter) private(i,j,k)
+    for(i=0; i<row; i++){
+        for (j = 0; j < col; j++)
+        {
+            ssize_t temp_i = (i*col + j);
+            ptr[temp_i] = 0;
+            for (k = 0; k < inter; k++)
+            {
+                // ptr[temp_i] = ptr[temp_i]  + ptr_1[i * inter + k] * ptr_2[k * col + j];
+                ptr[temp_i] = ptr[temp_i] + ptr_1[i * inter + k] * ptr_2[j * inter + k];
+            }
+        }
+    }
+    return temp;
+}
+
 ALLTYPE(ADD_SCALAR);
 ALLTYPE(ADD_VECTOR);
 
@@ -85,7 +111,6 @@ ALLTYPE(SUB_SCALAR);
 ALLTYPE(SUB_VECTOR);
 ALLTYPE(RSUB_SCALAR);
 
-// TODO: int64 return float32, fix it
 ALLTYPE_FLOAT(DIV_SCALAR);
 ALLTYPE_FLOAT(RDIV_SCALAR);
 ALLTYPE_FLOAT(DIV_VECTOR);

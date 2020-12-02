@@ -37,14 +37,14 @@ def _OP_2(a: np.ndarray, b: np.ndarray, types: str, op_name, right=False):
             a = a.astype(types)
         if TYPE_PRIORITY[str(b.dtype)] < TYPE_PRIORITY[types]:
             b = b.astype(types)
-        a, b = broadcast(a, b)
+        # a, b = broadcast(a, b)
         if right:
-            return getattr(omp, f'{op_name}_vector_' + types)(a, b)
-        else:
             return getattr(omp, f'{op_name}_vector_' + types)(b, a)
+        else:
+            return getattr(omp, f'{op_name}_vector_' + types)(a, b)
 
 def _OP_1(a: np.ndarray, types: str, op_name):
-    a = np.asanyarray(a)
+    # a = np.asanyarray(a)
     return getattr(omp, f'{op_name}_vector_' + types)(a)
 
 def omp_add(a: np.ndarray, b: np.ndarray, types: str):

@@ -128,6 +128,8 @@ int omp_thread_count();
 #define COS_VECTORNAME(type) py::array_t<float32> cos_vector_##type(py::array_t<type, py::array::c_style> &in_array)
 #define NEG_VECTORNAME(type) py::array_t<type> neg_vector_##type(py::array_t<type, py::array::c_style> &in_array)
 
+py::array_t<float32> matmul(py::array_t<float32, py::array::c_style> &mat1, py::array_t<float32, py::array::f_style> &mat2);
+
 ALLTYPE(ADD_SCALARNAME);
 ALLTYPE(ADD_VECTORNAME);
 
