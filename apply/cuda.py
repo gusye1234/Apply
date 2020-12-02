@@ -1,7 +1,9 @@
 from . import base
+from .base import TYPE_PRIORITY
 import pycuda.gpuarray as gpu
 from pycuda.elementwise import ElementwiseKernel
 from pycuda.compiler import SourceModule
+import numpy as np
 
 def query_device():
     import pycuda
@@ -126,32 +128,40 @@ kernels = {
 }
 
 
+from .utils import timer
+
 def _OP_2(a: gpu.GPUArray, b: gpu.GPUArray, types: str, op_name, right=False, return_type=None):
     return_type = return_type or types
-    temp = gpu.empty(a.shape, dtype=return_type)
+    with timer(name='create'):
+        temp = gpu.empty(a.shape, dtype=return_type)
     if np.isscalar(b):
         if TYPE_PRIORITY[str(a.dtype)] < TYPE_PRIORITY[types]:
             a = a.astype(types)
-        if right:
-            kernels[f'r{op_name}_scalar_' + types](temp, a, b)
-        else:
-            kernels[f'{op_name}_scalar_' + types](temp, a, b)
+        with timer(name='compute'):
+            if right:
+                kernels[f'r{op_name}_scalar_' + types](temp, a, b)
+            else:
+                kernels[f'{op_name}_scalar_' + types](temp, a, b)
     else:
-        if TYPE_PRIORITY[str(a.dtype)] < TYPE_PRIORITY[types]:
-            a = a.astype(types)
-        if TYPE_PRIORITY[str(b.dtype)] < TYPE_PRIORITY[types]:
-            b = b.astype(types)
+        with timer(name='convert'):
+            if TYPE_PRIORITY[str(a.dtype)] < TYPE_PRIORITY[types]:
+                a = a.astype(types)
+            if TYPE_PRIORITY[str(b.dtype)] < TYPE_PRIORITY[types]:
+                b = b.astype(types)
         # a, b = broadcast(a, b)
-        if right:
-            kernel[f'{op_name}_vector_' + types](temp, b, a)
-        else:
-            kernels[f'{op_name}_vector_' + types](temp, a, b)
+        with timer(name='compute'):
+            if right:   
+                kernel[f'{op_name}_vector_' + types](temp, b, a)
+            else:
+                kernels[f'{op_name}_vector_' + types](temp, a, b)
     return temp
 
 def _OP_1(a: gpu.GPUArray, types: str, op_name, return_type=None):
     return_type = return_type or types
-    temp = gpu.empty(a.shape, dtype=return_type)
-    kernels[f'{op_name}_vector_' + types](temp, a)
+    with timer(name='create'):
+        temp = gpu.empty(a.shape, dtype=return_type)
+    with timer(name='compute'):
+        kernels[f'{op_name}_vector_' + types](temp, a)
     return temp
 
 def cuda_add(a: gpu.GPUArray, b: gpu.GPUArray, types: str):

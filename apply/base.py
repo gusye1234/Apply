@@ -3,7 +3,7 @@ import os
 try:
     import pycuda
     import pycuda.autoinit
-    import pycuda.gouarray as gpu
+    import pycuda.gpuarray as gpu
     CUDA_SUPPORT = True
 except ModuleNotFoundError:
     CUDA_SUPPORT = False
