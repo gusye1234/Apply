@@ -5,7 +5,6 @@ from .utils import timer
 import pycuda.gpuarray as gpu
 from pycuda.elementwise import ElementwiseKernel
 from pycuda.compiler import SourceModule
-from jinja2 import Template
 import numpy as np
 
 def query_device():
