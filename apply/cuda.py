@@ -136,14 +136,21 @@ template = {
     "2_float32": ("float *temp,float *a, float* b", "temp[i] = f(a[i], b[i])", "__device__ float f(float a, float b){{return {command};}}")
 }
 
+def check_fusion(command):
+    a = b = c = 0
+    def one(x):
+        return x
+    def two(x, y):
+        return x
+    exp = sin = cos = one
+    eval(command)
 
 def fusion(command, name='custom'):
     assert isinstance(command, str)
     var_counts = 0
     support_var = ['a', 'b']
     try:
-        a = b = c = 0
-        eval(command)
+        check_fusion(command)
     except NameError:
         raise NameError(
             f"fusion only support [a, b, c] as flag, but got {command}")

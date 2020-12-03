@@ -209,10 +209,12 @@ def test_fusion():
     with timer(name='cuda'):
         a * b + 30 + 42 + 10 + a
 
-    a_n = a.to('omp')
-    b_n = a.to('omp')
+    a_n = a.to('omp').numpy()
+    a_c = a.to('omp')
+    b_n = a.to('omp').numpy()
+    print(type(a_n), type(a_c))
     with timer(name='numpy'):
-        a_n * b_n + 30 + 42 + 10 + a
+        a_n * b_n + 30 + 42 + 10 + a_n
 
 
 if __name__ == "__main__":
