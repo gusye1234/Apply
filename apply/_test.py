@@ -195,12 +195,25 @@ def test_cuda():
 
 def test_fusion():
     from . import cuda
+    from numpy.random import rand
     from .trace import array
-    func = cuda.fusion("a*b + 10")
-    a = array([1,2,3,4,5], dtype='float32')
-    b = array([1, 2, 3, 4, 5], dtype='float32')
+    from .utils import timer
+    func = cuda.fusion("a * b + 30 + 42 + 10 + a")
+    a = array(rand(10000, 200), dtype='float32').to('cuda')
+    b = array(rand(10000, 200), dtype='float32').to('cuda')
     c = func(a, b)
-    print(c)
+    c = a * b + 30 + 42 + 10 + a
+
+    with timer(name='no'):
+        func(a, b)
+    with timer(name='cuda'):
+        a * b + 30 + 42 + 10 + a
+
+    a_n = a.to('omp')
+    b_n = a.to('omp')
+    with timer(name='numpy'):
+        a_n * b_n + 30 + 42 + 10 + a
+
 
 if __name__ == "__main__":
     # test_ad()

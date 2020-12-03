@@ -40,7 +40,7 @@ class tracer(base_tracer):
         return _COPY(data, self)
 
     def to(self, name):
-        return tracer(np.copy(self._data), name)
+        return tracer(self._data, name)
 
     def moveAndMatch(self, b):
         if not isinstance(b, tracer):

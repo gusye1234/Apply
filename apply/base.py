@@ -40,11 +40,7 @@ class base_tracer:
             self._data = data
             self._scalar = False
         self._device = device(device_name)
-        if (self._device == 'cuda') and (not isinstance(self._data, gpu.GPUArray)) and (not self._scalar):
-            self._data = gpu.to_gpu(self._data)
-            assert str(self._data.dtype) in ['int32', 'float32']
-        if need_to_move:
-            self.move_data_to_()
+        self.move_data_to_()
 
     def get_device(self):
         return self._device
@@ -56,7 +52,11 @@ class base_tracer:
         return self._data
 
     def move_data_to_(self):
-        pass
+        if (self._device == 'cuda') and (not isinstance(self._data, gpu.GPUArray)) and (not self._scalar):
+            self._data = gpu.to_gpu(self._data)
+            assert str(self._data.dtype) in ['int32', 'float32']
+        elif (self._device == 'omp') and (not isinstance(self._data, np.ndarray)):
+            self._data = self._data.get()
 
     def __repr__(self):
         if self._scalar:
