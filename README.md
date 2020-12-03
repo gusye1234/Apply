@@ -23,4 +23,16 @@ If you're in macOS, run
 brew install llvm libomp
 ```
 
-Under `Apply`, run `make build` to build the extension. To install, run `make install` then.
+Run
+
+```
+pip install -r requirements.txt
+```
+
+
+
+Under `Apply/`, 
+
+* run `make build` to build the extension. 
+* To install, run `make install` then.
+
