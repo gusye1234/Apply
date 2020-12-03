@@ -1,8 +1,11 @@
 from . import base
 from .base import TYPE_PRIORITY
+from .trace import tracer
+from .utils import timer
 import pycuda.gpuarray as gpu
 from pycuda.elementwise import ElementwiseKernel
 from pycuda.compiler import SourceModule
+from jinja2 import Template
 import numpy as np
 
 def query_device():
@@ -128,7 +131,38 @@ kernels = {
 }
 
 
-from .utils import timer
+template = {
+    "1_float32": ("float *temp,float *a", "temp[i] = f(a[i])", "__device__ float f(float a){{return {command};}}"),
+    "2_float32": ("float *temp,float *a, float* b", "temp[i] = f(a[i], b[i])", "__device__ float f(float a, float b){{return {command};}}")
+}
+
+def fusion(command, name='custom'):
+    assert isinstance(command, str)
+    var_counts = 0
+    support_var = ['a', 'b']
+    try:
+        a = b = c = 0
+        eval(command)
+    except: NameError:
+        raise NameError(f"fusion only support [a, b, c] as flag, but got {command}")
+    for char in support_var:
+        if char in command:
+            var_counts += 1
+    temp = template[f"{var_counts}_float32"]
+    temp[2] = temp[2].format(command=command)
+    Func = ElementwiseKernel(
+        temp[0], temp[1],
+        preamble=temp[2]
+    )
+    def wrapper(*args):
+        for i, t in enumerate(args):
+            assert isinstance(t, tracer) and t.get_device() == 'cuda'
+            args[i] = t.numpy()
+        temp = gpu.empty_like(args[0])
+        Func(temp, *args)
+        temp = tracer(temp, device_name='cuda')
+        return temp
+    return wrapper
 
 def _OP_2(a: gpu.GPUArray, b: gpu.GPUArray, types: str, op_name, right=False, return_type=None):
     return_type = return_type or types
@@ -150,7 +184,7 @@ def _OP_2(a: gpu.GPUArray, b: gpu.GPUArray, types: str, op_name, right=False, re
                 b = b.astype(types)
         # a, b = broadcast(a, b)
         with timer(name='compute'):
-            if right:   
+            if right:
                 kernel[f'{op_name}_vector_' + types](temp, b, a)
             else:
                 kernels[f'{op_name}_vector_' + types](temp, a, b)

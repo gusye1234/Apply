@@ -193,6 +193,15 @@ def test_cuda():
     print(timer.dict())
 
 
+def test_fusion():
+    from . import cuda
+    from .trace import array
+    func = cuda.fusion("a*b + 10")
+    a = array([1,2,3,4,5], dtype='float32')
+    b = array([1, 2, 3, 4, 5], dtype='float32')
+    c = func(a, b)
+    print(c)
+
 if __name__ == "__main__":
     # test_ad()
     # # test_omp()

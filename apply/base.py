@@ -40,7 +40,7 @@ class base_tracer:
             self._data = data
             self._scalar = False
         self._device = device(device_name)
-        if self._device == 'cuda' and not isinstance(self._data, gpu.GPUArray) and not self._scalar:
+        if (self._device == 'cuda') and (not isinstance(self._data, gpu.GPUArray)) and (not self._scalar):
             self._data = gpu.to_gpu(self._data)
             assert str(self._data.dtype) in ['int32', 'float32']
         if need_to_move:
