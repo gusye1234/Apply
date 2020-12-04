@@ -1,6 +1,5 @@
 from . import base
-from .base import TYPE_PRIORITY
-from .trace import tracer
+from .base import TYPE_PRIORITY, base_tracer
 from .utils import timer
 import pycuda.gpuarray as gpu
 from pycuda.elementwise import ElementwiseKernel
@@ -144,33 +143,6 @@ def check_fusion(command):
     exp = sin = cos = one
     eval(command)
 
-def fusion(command, name='custom'):
-    assert isinstance(command, str)
-    var_counts = 0
-    support_var = ['a', 'b']
-    try:
-        check_fusion(command)
-    except NameError:
-        raise NameError(
-            f"fusion only support [a, b, c] as flag, but got {command}")
-    for char in support_var:
-        if char in command:
-            var_counts += 1
-    temp = template[f"{var_counts}_float32"]
-    temp[2] = temp[2].format(command=command)
-    Func = ElementwiseKernel(temp[0], temp[1], preamble=temp[2])
-
-    def wrapper(*args):
-        numpy_args = []
-        for i, t in enumerate(args):
-            assert isinstance(t, tracer) and t.get_device() == 'cuda'
-            numpy_args.append(t.numpy())
-        temp = gpu.empty_like(numpy_args[0])
-        Func(temp, *numpy_args)
-        temp = tracer(temp, device_name='cuda')
-        return temp
-
-    return wrapper
 
 
 def _OP_2(a: gpu.GPUArray, b: gpu.GPUArray, types: str, op_name, right=False, return_type=None):

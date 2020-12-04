@@ -196,9 +196,9 @@ def test_cuda():
 def test_fusion():
     from . import cuda
     from numpy.random import rand
-    from .trace import array
+    from .trace import array, fusion
     from .utils import timer
-    func = cuda.fusion("a * b + 30 + 42 + 10 + a")
+    func = fusion("a * b + 30 + 42 + 10 + a")
     a = array(rand(10000, 200), dtype='float32').to('cuda')
     b = array(rand(10000, 200), dtype='float32').to('cuda')
     c = func(a, b)
