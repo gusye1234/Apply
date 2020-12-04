@@ -55,7 +55,7 @@ class base_tracer:
         if (self._device == 'cuda') and (not isinstance(self._data, gpu.GPUArray)) and (not self._scalar):
             self._data = gpu.to_gpu(self._data)
             assert str(self._data.dtype) in ['int32', 'float32']
-        elif (self._device == 'omp') and (not isinstance(self._data, np.ndarray)):
+        elif (self._device == 'omp') and (not isinstance(self._data, np.ndarray)) and (not self._scalar):
             self._data = self._data.get()
 
     def __repr__(self):
