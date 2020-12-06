@@ -47,7 +47,7 @@ def test_arr():
     print(omp.div_scalar_int32(a, 2.3))
     print(a/2)
 
-def test_add():
+def test_cpp():
     from . import omp
     from .openmp import omp_add
     from .trace import tracer
@@ -157,9 +157,9 @@ def test_cuda():
     a_t = tracer(a, device_name='cuda')
 
     with timer(name='omp cos'):
-        a_t.cos()
+        c1 = a_t.cos()
     with timer(name='omp sin'):
-        a_t.sin()
+        c2 = a_t.sin()
     with timer(name='omp exp'):
         a_t.exp()
     with timer(name='omp sub'):
@@ -175,9 +175,9 @@ def test_cuda():
     print(timer.dict())
     timer.zero()
     with timer(name='np cos'):
-        np.cos(a)
+        c1n = np.cos(a)
     with timer(name='np sin'):
-        np.sin(a)
+        c2n = np.sin(a)
     with timer(name='np exp'):
         np.exp(a)
     with timer(name='np sub'):
@@ -191,6 +191,11 @@ def test_cuda():
     with timer(name='np neg'):
         -a
     print(timer.dict())
+    print("omp cos", c1[:10])
+    print("np cos", c1n[:10])
+    print("omp cos", c2[:10])
+    print("np cos", c2n[:10])
+
 
 
 def test_fusion():
@@ -219,9 +224,9 @@ def test_fusion():
 
 if __name__ == "__main__":
     # test_ad()
-    # # test_omp()
+    # test_omp()
     # test_arr()
-    # test_add()
+    test_cpp()
     # test_sigmoid()
     # test_mat()
     # test_LR()
